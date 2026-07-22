@@ -1,0 +1,104 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default-deny catch-all rule
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(email) {
+      return isSignedIn() && request.auth.token.email == email;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-\\+\\.\\@]+$');
+    }
+
+    function isValidProfile(data) {
+      return data.name is string && data.name.size() <= 100
+          && data.phone is string && data.phone.size() <= 30
+          && data.email is string && data.email.size() <= 100
+          && (!('address' in data) || data.address == null || (data.address is string && data.address.size() <= 500))
+          && (!('userRole' in data) || data.userRole == null || (data.userRole is string && data.userRole.size() <= 50))
+          && (!('vehicles' in data) || data.vehicles == null || (data.vehicles is list && data.vehicles.size() <= 2))
+          && (!('licenseNumber' in data) || data.licenseNumber == null || (data.licenseNumber is string && data.licenseNumber.size() <= 100))
+          && (!('password' in data) || data.password == null || (data.password is string && data.password.size() <= 100));
+    }
+
+    function isValidDispatch(data) {
+      return data.id is string && data.id.size() <= 100
+          && data.category is string && data.category.size() <= 100
+          && data.pickupAddress is string && data.pickupAddress.size() <= 500
+          && data.dropAddress is string && data.dropAddress.size() <= 500
+          && data.priority is string && data.priority.size() <= 100
+          && data.status is string && data.status.size() <= 100
+          && data.userEmail is string && data.userEmail.size() <= 100;
+    }
+
+    function isValidLog(data) {
+      return data.id is string && data.id.size() <= 100
+          && data.userEmail is string && data.userEmail.size() <= 100
+          && data.timestamp is string && data.timestamp.size() <= 100
+          && data.message is string && data.message.size() <= 1000
+          && data.type is string && data.type.size() <= 100;
+    }
+
+    // Profiles Collection rules
+    match /customer_profiles/{email} {
+      allow get: if isSignedIn() && (request.auth.token.email.lower() == email.lower() || resource == null);
+      allow list: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(email) && isValidProfile(request.resource.data);
+      allow delete: if false;
+
+      // Addresses subcollection
+      match /addresses/{addressId} {
+        allow read: if isSignedIn() && request.auth.token.email.lower() == email.lower();
+        allow create, update: if isSignedIn() && request.auth.token.email.lower() == email.lower() && isValidId(addressId);
+        allow delete: if isSignedIn() && request.auth.token.email.lower() == email.lower() && isValidId(addressId);
+      }
+    }
+
+    match /rider_profiles/{email} {
+      allow get: if isSignedIn() && (request.auth.token.email.lower() == email.lower() || resource == null);
+      allow list: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(email) && isValidProfile(request.resource.data);
+      allow delete: if false;
+    }
+
+    match /profiles/{email} {
+      allow get: if isSignedIn() && (request.auth.token.email.lower() == email.lower() || resource == null);
+      allow list: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(email) && isValidProfile(request.resource.data);
+      allow delete: if false;
+
+      // Addresses subcollection
+      match /addresses/{addressId} {
+        allow read: if isSignedIn() && request.auth.token.email.lower() == email.lower();
+        allow create, update: if isSignedIn() && request.auth.token.email.lower() == email.lower() && isValidId(addressId);
+        allow delete: if isSignedIn() && request.auth.token.email.lower() == email.lower() && isValidId(addressId);
+      }
+    }
+
+    // Dispatches Collection rules
+    match /dispatches/{dispatchId} {
+      allow get: if isSignedIn() && resource.data.userEmail == request.auth.token.email;
+      allow list: if isSignedIn() && resource.data.userEmail == request.auth.token.email;
+      allow create, update: if isSignedIn() && request.resource.data.userEmail == request.auth.token.email && isValidId(dispatchId) && isValidDispatch(request.resource.data);
+      allow delete: if isSignedIn() && resource.data.userEmail == request.auth.token.email;
+    }
+
+    // Logs Collection rules
+    match /logs/{logId} {
+      allow get: if isSignedIn() && resource.data.userEmail == request.auth.token.email;
+      allow list: if isSignedIn() && resource.data.userEmail == request.auth.token.email;
+      allow create, update: if isSignedIn() && request.resource.data.userEmail == request.auth.token.email && isValidId(logId) && isValidLog(request.resource.data);
+      allow delete: if isSignedIn() && resource.data.userEmail == request.auth.token.email;
+    }
+  }
+}

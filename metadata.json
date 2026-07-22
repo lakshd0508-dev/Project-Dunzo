@@ -1,0 +1,6 @@
+{
+  "name": "Project Dunzo",
+  "description": "Secure access and interactive responsive portal for Project Dunzo address management.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

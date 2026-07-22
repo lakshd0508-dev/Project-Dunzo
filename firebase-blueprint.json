@@ -1,0 +1,150 @@
+{
+  "collections": {
+    "customer_profiles": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "phone": { "type": "string" },
+          "email": { "type": "string" },
+          "address": { "type": "string" },
+          "city": { "type": "string" },
+          "state": { "type": "string" },
+          "pincode": { "type": "string" },
+          "userRole": { "type": "string" },
+          "authMethod": { "type": "string" },
+          "password": { "type": "string" },
+          "updatedAt": { "type": "string" }
+        },
+        "required": ["name", "phone", "email"]
+      },
+      "indexes": []
+    },
+    "rider_profiles": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "phone": { "type": "string" },
+          "email": { "type": "string" },
+          "address": { "type": "string" },
+          "city": { "type": "string" },
+          "state": { "type": "string" },
+          "pincode": { "type": "string" },
+          "userRole": { "type": "string" },
+          "authMethod": { "type": "string" },
+          "password": { "type": "string" },
+          "vehicles": { 
+            "type": "array",
+            "items": { "type": "string" },
+            "maxItems": 1
+          },
+          "licenseNumber": { "type": "string" },
+          "dispatchZone": { "type": "string" },
+          "deliveryInstructions": { "type": "string" },
+          "updatedAt": { "type": "string" }
+        },
+        "required": ["name", "phone", "email"]
+      },
+      "indexes": []
+    },
+    "profiles": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "phone": { "type": "string" },
+          "email": { "type": "string" },
+          "address": { "type": "string" },
+          "city": { "type": "string" },
+          "state": { "type": "string" },
+          "pincode": { "type": "string" },
+          "userRole": { "type": "string" },
+          "vehicles": { 
+            "type": "array",
+            "items": { "type": "string" },
+            "maxItems": 1
+          },
+          "licenseNumber": { "type": "string" },
+          "dispatchZone": { "type": "string" },
+          "deliveryInstructions": { "type": "string" },
+          "updatedAt": { "type": "string" }
+        },
+        "required": ["name", "phone", "email"]
+      },
+      "indexes": []
+    },
+    "dispatches": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "userEmail": { "type": "string" },
+          "category": { "type": "string" },
+          "pickupAddress": { "type": "string" },
+          "dropAddress": { "type": "string" },
+          "priority": { "type": "string" },
+          "status": { "type": "string" },
+          "progress": { "type": "number" },
+          "createdAt": { "type": "string" },
+          "agentName": { "type": "string" },
+          "agentPhone": { "type": "string" },
+          "estimatedTime": { "type": "number" },
+          "elapsedTime": { "type": "number" },
+          "pickupCoords": {
+            "type": "object",
+            "properties": {
+              "x": { "type": "number" },
+              "y": { "type": "number" }
+            }
+          },
+          "dropCoords": {
+            "type": "object",
+            "properties": {
+              "x": { "type": "number" },
+              "y": { "type": "number" }
+            }
+          },
+          "currentCoords": {
+            "type": "object",
+            "properties": {
+              "x": { "type": "number" },
+              "y": { "type": "number" }
+            }
+          }
+        },
+        "required": ["id", "userEmail", "category", "pickupAddress", "dropAddress", "priority", "status", "progress", "createdAt", "agentName", "agentPhone", "estimatedTime", "elapsedTime"]
+      },
+      "indexes": [
+        {
+          "fields": [
+            { "fieldPath": "userEmail", "order": "ASCENDING" },
+            { "fieldPath": "createdAt", "order": "DESCENDING" }
+          ]
+        }
+      ]
+    },
+    "logs": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "userEmail": { "type": "string" },
+          "timestamp": { "type": "string" },
+          "message": { "type": "string" },
+          "type": { "type": "string" },
+          "createdAt": { "type": "string" }
+        },
+        "required": ["id", "userEmail", "timestamp", "message", "type", "createdAt"]
+      },
+      "indexes": [
+        {
+          "fields": [
+            { "fieldPath": "userEmail", "order": "ASCENDING" },
+            { "fieldPath": "createdAt", "order": "DESCENDING" }
+          ]
+        }
+      ]
+    }
+  }
+}
